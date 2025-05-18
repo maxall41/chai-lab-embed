@@ -550,7 +550,7 @@ def run_inference(
         esm_device=torch_device,
     )
 
-    with h5py.File(out_hdf5, "w") as h5f:
+    with h5py.File(output_dir / "out.hdf5", "w") as h5f:
         for trunk_idx in range(num_trunk_samples):
             logging.info(f"Trunk sample {trunk_idx + 1}/{num_trunk_samples}")
             token_single_trunk_repr, token_pair_trunk_repr = (
@@ -571,11 +571,11 @@ def run_inference(
                 )
             )
             h5f.create_dataset(
-                output_dir / "single_trunk_repr.torch",
+                "single_trunk_repr",
                 data=token_single_trunk_repr.cpu(),
             )
             h5f.create_dataset(
-                output_dir / "pair_trunk_repr.torch",
+                "pair_trunk_repr",
                 data=token_pair_trunk_repr.cpu(),
             )
 
