@@ -569,7 +569,7 @@ def run_inference(
         torch.save(token_single_trunk_repr, output_dir / "single_trunk_repr.pt")
         torch.save(token_pair_trunk_repr, output_dir / "pair_trunk_repr.pt")
 
-    return embeddings
+    return None
 
 
 def _bin_centers(min_bin: float, max_bin: float, no_bins: int) -> Tensor:
