@@ -11,7 +11,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Generator, Sequence
 
-import h5py
 import torch
 from torch import Tensor
 from tqdm import tqdm
@@ -550,34 +549,25 @@ def run_inference(
         esm_device=torch_device,
     )
 
-    with h5py.File(output_dir / "out.hdf5", "w") as h5f:
-        for trunk_idx in range(num_trunk_samples):
-            logging.info(f"Trunk sample {trunk_idx + 1}/{num_trunk_samples}")
-            token_single_trunk_repr, token_pair_trunk_repr = (
-                run_folding_on_context(
-                    feature_context,
-                    output_dir=(
-                        output_dir / f"trunk_{trunk_idx}"
-                        if num_trunk_samples > 1
-                        else output_dir
-                    ),
-                    num_trunk_recycles=num_trunk_recycles,
-                    num_diffn_timesteps=num_diffn_timesteps,
-                    num_diffn_samples=num_diffn_samples,
-                    recycle_msa_subsample=recycle_msa_subsample,
-                    seed=seed + trunk_idx if seed is not None else None,
-                    device=torch_device,
-                    low_memory=low_memory,
-                )
-            )
-            h5f.create_dataset(
-                "single_trunk_repr",
-                data=token_single_trunk_repr.cpu(),
-            )
-            h5f.create_dataset(
-                "pair_trunk_repr",
-                data=token_pair_trunk_repr.cpu(),
-            )
+    for trunk_idx in range(num_trunk_samples):
+        logging.info(f"Trunk sample {trunk_idx + 1}/{num_trunk_samples}")
+        token_single_trunk_repr, token_pair_trunk_repr = run_folding_on_context(
+            feature_context,
+            output_dir=(
+                output_dir / f"trunk_{trunk_idx}"
+                if num_trunk_samples > 1
+                else output_dir
+            ),
+            num_trunk_recycles=num_trunk_recycles,
+            num_diffn_timesteps=num_diffn_timesteps,
+            num_diffn_samples=num_diffn_samples,
+            recycle_msa_subsample=recycle_msa_subsample,
+            seed=seed + trunk_idx if seed is not None else None,
+            device=torch_device,
+            low_memory=low_memory,
+        )
+        torch.save(token_single_trunk_repr, output / "single_trunk_repr.pt")
+        torch.save(token_pair_trunk_repr, output / "pair_trunk_repr.pt")
 
     return embeddings
 
