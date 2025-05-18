@@ -566,8 +566,8 @@ def run_inference(
             device=torch_device,
             low_memory=low_memory,
         )
-        torch.save(token_single_trunk_repr, output / "single_trunk_repr.pt")
-        torch.save(token_pair_trunk_repr, output / "pair_trunk_repr.pt")
+        torch.save(token_single_trunk_repr, output_dir / "single_trunk_repr.pt")
+        torch.save(token_pair_trunk_repr, output_dir / "pair_trunk_repr.pt")
 
     return embeddings
 
